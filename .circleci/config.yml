@@ -1,25 +1,14 @@
 version: 2.1
-
+orbs:
+  node: circleci/node@1.1
 jobs:
   build:
-    working_directory: ~/circleci-python
-    docker:
-      - image: "circleci/python:3.6.4"
+    executor:
+      name: node/default
+      tag: '10.4'
     steps:
       - checkout
-      - run: python3 main.py
-  test:
-    working_directory: ~/circleci-python
-    docker:
-      - image: "circleci/python:3.6.4"
-    steps:
-      - checkout
-      - run: python3 main-test.py
-
-workflows:
-  build_and_test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
+      - node/with-cache:
+          steps:
+            - run: npm install
+      - run: npm run test
