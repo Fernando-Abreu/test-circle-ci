@@ -1,25 +1,206 @@
 version: 2.1
 
+# The lein image needed for most things.
+lein_image: &lein_image
+  image: circleci/ruby:2.4.1
+  auth:
+    username: $DOCKER_HUB_USER
+    password: $DOCKER_HUB_PASSWORD
 jobs:
   build:
-    working_directory: ~/circleci-python
     docker:
-      - image: "circleci/python:3.6.4"
+      - *lein_image
     steps:
-      - checkout
-      - run: python3 main.py
+      - run: echo "this is the build job"
+  check_syntax:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the check_syntax job"
   test:
-    working_directory: ~/circleci-python
     docker:
-      - image: "circleci/python:3.6.4"
+      - *lein_image
     steps:
-      - checkout
-      - run: python3 main-test.py
+      - run: echo "this is the test job"
+  coverage:
+    docker:
+      - image: circleci/ruby:2.4.1
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+    steps:
+      - run: sleep 6
+  job1:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 1job job"
+  job2:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 2job job"
+  job3:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 3job job"
+  job4:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 4job job"
+  job5:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 5job job"
+  job6:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 6job job"
+  job7:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 7job job"
+  job8:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 8job job"
+  job9:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the 9job job"
+  job10:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job10 job"
+  job11:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job11 job"
+  job12:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job12 job"
+  job13:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job13 job"
+  job14:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job14 job"
+  job15:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job15 job"
+  job16:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job16 job"
+  job17:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job17 job"
+  job18:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job18 job"
+  job19:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job19 job"
+  job20:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job20 job"
+  job21:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job21 job"
+  job22:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job22 job"
+  job23:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job23 job"
+  job24:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job24 job"
+  job25:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job25 job"
+  job26:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job26 job"
+  job27:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job27 job"
+  job28:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "this is the job28 job"
 
 workflows:
-  build_and_test:
+  version: 2
+  # workflow-with-fan-out:
+  #   jobs:
+  #     - build
+  #     - test:
+  #         requires:
+  #           - build
+  #     - job1:
+  #         requires:
+  #           - test
+  #     - job2:
+  #         requires:
+  #           - test
+  #     - job3:
+  #         requires:
+  #           - test
+  #     - job4:
+  #         requires:
+  #           - test
+  #     - job5:
+  #         requires:
+  #           - test
+            
+  workflow-with-fan-in:
     jobs:
-      - build
-      - test:
+      - check_syntax
+      - job6:
           requires:
-            - build
+            - check_syntax
+      - coverage:
+          requires:
+            - job6
