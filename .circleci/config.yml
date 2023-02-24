@@ -36,7 +36,7 @@ jobs:
     docker:
       - *lein_image
     steps:
-      - run: echo "this is the check_syntax job"
+      - run: echo "this is the check_syntax job2"
   test:
     docker:
       - *lein_image
