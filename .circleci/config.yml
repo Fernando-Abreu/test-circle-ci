@@ -49,7 +49,11 @@ jobs:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
     steps:
+<<<<<<< HEAD
       - run: sleep 1
+=======
+      - run: sleep 600
+>>>>>>> b09cbcb (Increases sleep time)
   job1:
     docker:
       - *lein_image
