@@ -3,110 +3,20 @@ version: 2.1
 # The lein image needed for most things.
 lein_image: &lein_image
   image: circleci/ruby:2.4.1
-  auth:
-    username: $DOCKER_HUB_USER
-    password: $DOCKER_HUB_PASSWORD
 jobs:
-  build:
+  success_job:
     docker:
       - *lein_image
     steps:
-      - run: echo "this is the build job yes4"
-
-  found_tag:
+      - run: echo "passing"
+  fail_job:
     docker:
       - *lein_image
     steps:
-      - run: echo "has tag << pipeline.git.tag >>"
-
-  found_tag_with_filter:
-    docker:
-      - *lein_image
-    steps:
-      - run: echo "has tag with filter << pipeline.git.tag >>"    
-
-  found_branch:
-    docker:
-      - *lein_image
-    steps:
-      - run: echo "has branch << pipeline.git.branch >>"  
-
-
-  check_syntax:
-    docker:
-      - *lein_image
-    steps:
-      - run: echo "this is the check_syntax job2"
-  test:
-    docker:
-      - *lein_image
-    steps:
-      - run: echo "this is the test job"
-  coverage:
-    docker:
-      - image: circleci/ruby:2.4.1
-        auth:
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASSWORD
-    steps:
-<<<<<<< HEAD
-      - run: sleep 1
-=======
-      - run: sleep 600
->>>>>>> b09cbcb (Increases sleep time)
-  job1:
-    docker:
-      - *lein_image
-    steps:
-      - run: echo "this is the job 1"
-  
+    - run: echo "not passing" && false  
 
 workflows:
-  version: 2
-  worflow-tag:
-    when: << pipeline.git.tag >>
+  workflow_test:
     jobs:
-      - found_tag
-
-  worflow-branch:
-    when: << pipeline.git.branch >>
-    jobs:
-      - found_branch
-
-  worflow-tag-filter-with-when:
-    when:
-     equal: [webhook, << pipeline.trigger_source >>]
-    jobs:
-      - found_tag_with_filter:
-          filters:
-            tags:
-             only: /.*/  
-      - found_tag_with_filter
-
-  worflow-tag-filter-with-when-2:
-    when: << pipeline.git.tag >>
-    jobs:
-      - coverage   
-      - found_tag_with_filter:
-          filters:
-            tags:
-             only: /.*/  
-       
-
-  worflow-tag-filter-without-when:
-    jobs:
-      - coverage
-      - found_tag_with_filter:
-          filters:
-            tags:
-             only: /.*/             
-            
-  workflow-with-fan-in:
-    jobs:
-      - check_syntax
-      - job1:
-          requires:
-            - check_syntax
-      - coverage:
-          requires:
-            - job1
+      - success_job
+      - fail_job
