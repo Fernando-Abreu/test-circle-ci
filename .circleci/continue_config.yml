@@ -1,0 +1,22 @@
+version: 2.1
+
+# The lein image needed for most things.
+lein_image: &lein_image
+  image: circleci/ruby:2.4.1
+jobs:
+  success_job:
+    docker:
+      - *lein_image
+    steps:
+      - run: echo "passing"
+  fail_job:
+    docker:
+      - *lein_image
+    steps:
+    - run: echo "not passing" && false  
+
+workflows:
+  workflow_test:
+    jobs:
+      - success_job
+      - fail_job

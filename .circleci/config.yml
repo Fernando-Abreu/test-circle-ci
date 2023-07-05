@@ -1,22 +1,19 @@
 version: 2.1
 
-# The lein image needed for most things.
-lein_image: &lein_image
-  image: circleci/ruby:2.4.1
+setup: true
+orbs:
+  continuation: circleci/continuation@0.4
+
 jobs:
-  success_job:
-    docker:
-      - *lein_image
+  setup:
+    executor: continuation/default
     steps:
-      - run: echo "passing"
-  fail_job:
-    docker:
-      - *lein_image
-    steps:
-    - run: echo "not passing" && false  
+      - run: echo "Here"
+      - continuation/continue:
+          configuration_path: .circleci/continue_config.yml
+
 
 workflows:
-  workflow_test:
+  setup:
     jobs:
-      - success_job
-      - fail_job
+      - setup
