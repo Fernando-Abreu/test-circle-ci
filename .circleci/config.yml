@@ -1,7 +1,7 @@
 version: 2.1
 setup: true
 orbs:
-  continuation: circleci/continuation@dev:19e80d708e9a7720d87448eac048372270ff607d
+  continuation: circleci/continuation@latest
 workflows:
   use-my-orb:
     jobs:
