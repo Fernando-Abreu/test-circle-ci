@@ -1,0 +1,18 @@
+version: 2.1
+
+parameters:
+  image-tag:
+    type: string
+    default: "none"
+
+jobs:
+  print_tag:
+    docker:
+      - image: cimg/base:2023.03
+    steps:
+      - run: echo "<< pipeline.parameters.image-tag >>"
+
+workflows:
+  sample_workflow:
+    jobs:
+      - print_tag
