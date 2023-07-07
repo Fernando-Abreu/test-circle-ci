@@ -1,8 +1,8 @@
   version: 2.1
   setup: true
   orbs:
-    continuation: circleci/continuation@0.4.0
-  
+    path-filtering: circleci/path-filtering@dev:aed133a147a453f89ef92001a73420f04db01679
+    
   jobs:
     env-var-test:
       machine:
@@ -17,5 +17,10 @@
     use-my-orb:
       jobs:
         - env-var-test
-        - continuation/continue:
-            configuration_path: ".circleci/continue_config.yml"
+        - path-filtering/filter:
+            base-revision: main
+            config-path: .circleci/continue_config.yml
+            mapping: |
+              ./* static-checks true
+
+
