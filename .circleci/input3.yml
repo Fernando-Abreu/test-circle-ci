@@ -1,5 +1,10 @@
 version: 2.1
 
+parameters:
+  static-checks-3:
+    type: boolean
+    default: false
+
 jobs:
   static-checks-2:
     docker:
