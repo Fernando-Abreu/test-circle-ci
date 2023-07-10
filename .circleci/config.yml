@@ -1,7 +1,7 @@
   version: 2.1
   setup: true
   orbs:
-    path-filtering: circleci/path-filtering@0.1.5
+    path-filtering: circleci/path-filtering@0.1.6
     
   jobs:
     env-var-test:
@@ -25,8 +25,9 @@
         - env-var-test
         - path-filtering/filter:
             base-revision: main
-            config-path: .circleci/continue_config.yml
             mapping: |
-              ./* static-checks true
+              * static-checks true .circleci/input1.yml
+              * static-checks-2 true .circleci/input2.yml
+              * static-checks-3 true .circleci/input3.yml
 
 
