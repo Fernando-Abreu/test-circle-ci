@@ -1,45 +1,33 @@
 version: 2.1
-
 jobs:
-  job1:
+  parent_job:
     docker:
       - image: cimg/base:stable
     steps:
+      - checkout
       - run:
-          name: "Running Job 1"
-          command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+          name: Generate a file
+          command: echo "Hello from parent job" > parent_job_file.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - parent_job_file.txt
 
-  job2:
+  child_job:
     docker:
       - image: cimg/base:stable
     steps:
+      - attach_workspace:
+          at: .
       - run:
-          name: "Running Job 2"
-          command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
-
-  job3:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: "Running Job 3"
-          command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+          name: Use the file from parent job
+          command: cat ./parent_job_file.txt
 
 workflows:
   version: 2
-  build_and_test:
+  build_and_use_file:
     jobs:
-      - job1
-      - job2
-      - job3:
+      - parent_job
+      - child_job:
           requires:
-            - job1
+            - parent_job
