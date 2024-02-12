@@ -1,13 +1,25 @@
 version: 2.1
 jobs:
-  parent_job:
+  parent_job_1:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
       - run:
           name: Generate a file
-          command: echo "Hello from parent job" > parent_job_file.txt
+          command: echo "Hello from parent job 1" > parent_job_file.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - parent_job_file.txt
+  parent_job_2:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Generate a file
+          command: echo "Hello from parent job 2" > parent_job_file.txt
       - persist_to_workspace:
           root: .
           paths:
@@ -27,7 +39,9 @@ workflows:
   version: 2
   build_and_use_file:
     jobs:
-      - parent_job
+      - parent_job_1
+      - parent_job_2
       - child_job:
           requires:
-            - parent_job
+            - parent_job_1
+            - parent_job_2
