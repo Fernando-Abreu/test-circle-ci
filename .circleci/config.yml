@@ -1,45 +1,147 @@
 version: 2.1
-
 jobs:
-  job1:
+  build:
     docker:
-      - image: cimg/base:stable
+      - image: python:2.7
+    working_directory: /gordon-test
     steps:
+      - run: env
+      - checkout
       - run:
-          name: "Running Job 1"
+          name: make some files
           command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+            BRANCH_NAME=<<pipeline.git.branch>>
+            echo "Totes got a branch name: ${BRANCH_NAME}"
+            mkdir -p /tmp/my_workspace
+            echo "first artifact" > /tmp/my_workspace/first
+            echo "second artifact" > /tmp/my_workspace/second
+            mkdir -p /tmp/my_workspace/python
+            cp hello.py /tmp/my_workspace/python/
 
-  job2:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: "Running Job 2"
-          command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
+      - persist_to_workspace:
+          root: /tmp/my_workspace
+          paths:
+            - "*"
 
-  job3:
+      - store_artifacts:
+          path: /tmp/my_workspace
+          destination: text-data
+
+  test:
     docker:
-      - image: cimg/base:stable
+      - image: python:2.7
+    working_directory: /gordon-test
+    steps:
+      - attach_workspace:
+          at: /tmp/my_workspace
+
+      - run:
+          command: echo "third artifact!!" > /tmp/my_workspace/third
+          pwd: /
+
+      - run:
+          command: echo "overwritten first artifact!!" > /tmp/my_workspace/first
+          pwd: /
+
+      - persist_to_workspace:
+          root: /tmp/my_workspace
+          paths:
+            - third
+            - first
+
+      - run:
+          command: sleep 10
+
+  unreasonably-long-name-for-a-workflows-job-that-bitbucket-sees:
+    docker:
+      - image: python:2.7
+    working_directory: /gordon-test
+    steps:
+      - attach_workspace:
+          at: /tmp/my_workspace
+
+      - run:
+          command: |
+            echo "fourth artifact!!" > /tmp/my_workspace/fourth
+            echo "fifth artifact!!" > /tmp/my_workspace/fifth
+          pwd: /
+
+      - persist_to_workspace:
+          root: /tmp/my_workspace
+          paths:
+            - fourth
+            - fifth
+
+  write-no-data:
+    parameters:
+      foo:
+        type: string
+    docker:
+      - image: python:2.7
+    working_directory: /gordon-test
     steps:
       - run:
-          name: "Running Job 3"
+          command: echo "hi" << parameters.foo >>
+          pwd: /
+
+  deploy:
+    docker:
+      - image: python:2.7
+    working_directory: /gordon-test
+    steps:
+      - run:
+          command: echo "deploying! (not really) "
+          pwd: /
+
+      - run:
+          name: "Workflow workspace env vars"
           command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+            echo "CIRCLE_WORKFLOW_ID=${CIRCLE_WORKFLOW_ID}"
+            echo "CIRCLE_WORKFLOW_WORKSPACE_ID=${CIRCLE_WORKFLOW_WORKSPACE_ID}"
+            echo "CIRCLE_WORKFLOW_JOB_ID=${CIRCLE_WORKFLOW_JOB_ID}"
+            echo "CIRCLE_WORKFLOW_UPSTREAM_JOB_IDS=${CIRCLE_WORKFLOW_UPSTREAM_JOB_IDS}"
+            echo "CIRCLE_WORKFLOW_CONCURRENCY_MAP=${CIRCLE_WORKFLOW_CONCURRENCY_MAP}"
+          pwd: /
+
+      - attach_workspace:
+          at: my_workspace
+
+      - run: find /gordon-test/my_workspace
+
+      - run:
+          command: |
+            find /gordon-test/my_workspace -type f | while read _f; do
+              echo
+              echo ">>> ${_f} <<<"
+              cat ${_f}
+            done
+      - run:
+          name: Deploy
+          command: |
+            ssh -o StrictHostKeyChecking=no deploy_user@"${NGROK_HOST}" -p "${NGROK_PORT}" /home/vagrant/fake-deployment/bin/deploy "http://localhost:8080/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/approve/${CIRCLE_WORKFLOW_JOB_ID}"
 
 workflows:
-  version: 2
-  build_and_test:
+  breaking-workspaces:
     jobs:
-      - job1
-      - job2
-      - job3:
+      - approve:
+          type: approval
+      - build:
           requires:
-            - job1
+            - approve
+          context: ["a-context", "restricted-context"]
+      - write-no-data:
+          requires:
+            - build
+          foo: "this is some stuff"
+      - test:
+          requires:
+            - build
+      - unreasonably-long-name-for-a-workflows-job-that-bitbucket-sees:
+          requires:
+            - build
+      - deploy:
+          type: approval
+          requires:
+            - test
+            - unreasonably-long-name-for-a-workflows-job-that-bitbucket-sees
+            - write-no-data
