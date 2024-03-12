@@ -8,38 +8,11 @@ jobs:
       - run:
           name: "Running Job 1"
           command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
-
-  job2:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: "Running Job 2"
-          command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
-
-  job3:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: "Running Job 3"
-          command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+            echo "<< pipeline.git.revision >>"
+            echo "<< pipeline.git.base_revision >>"
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - job1
-      - job2
-      - job3:
-          requires:
-            - job1
