@@ -37,9 +37,8 @@ jobs:
 workflows:
   version: 2
   build_and_test:
+    when:
+      not:
+        equal: ["<< pipeline.git.tag >>", ""]
     jobs:
       - job1
-      - job2
-      - job3:
-          requires:
-            - job1
