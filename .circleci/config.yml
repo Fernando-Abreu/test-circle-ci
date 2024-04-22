@@ -1,45 +1,34 @@
 version: 2.1
 
 jobs:
-  job1:
+  A:
     docker:
       - image: cimg/base:stable
     steps:
-      - run:
-          name: "Running Job 1"
-          command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+      - run: echo "Running Job A"
 
-  job2:
+  B:
     docker:
       - image: cimg/base:stable
     steps:
-      - run:
-          name: "Running Job 2"
-          command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
+      - run: echo "Running Job B"
 
-  job3:
+  C:
     docker:
       - image: cimg/base:stable
     steps:
-      - run:
-          name: "Running Job 3"
-          command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+      - run: echo "Running Job C"
 
 workflows:
   version: 2
-  build_and_test:
+  workflow:
     jobs:
-      - job1
-      - job2
-      - job3:
+      - A
+      - B:
+          filters:
+            branches:
+              only: master
+      - C:
           requires:
-            - job1
+            - A
+            - B
