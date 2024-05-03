@@ -8,7 +8,7 @@ jobs:
       - run:
           name: "Running Job"
           command: |
-            echo "<< pipeline.git.tag >>"
+            echo "<< pipeline.git.bla >>"
 
 workflows:
   version: 2
