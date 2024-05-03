@@ -6,9 +6,9 @@ jobs:
       - image: cimg/base:stable
     steps:
       - run:
-          name: "Running Job 1"
+          name: "Running Job"
           command: |
-            echo "<< pipeline.git.branch >>"
+            echo "<< pipeline.git.tag >>"
 
 workflows:
   version: 2
