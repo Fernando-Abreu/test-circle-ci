@@ -1,50 +1,87 @@
 version: 2.1
 
 jobs:
-  job_a:
+  a1:
     docker:
       - image: circleci/python:3.8
     steps:
       - checkout
       - run:
-          name: Step A1
+          name: A1
           command: |
-            echo "Running step A1"
-            exit 1
-      - run:
-          name: Step A2 (Fail)
-          command: |
-            echo "Running step A2"
-            sleep 30
-      - run:
-          name: Step A3
-          command: |
-            echo "Running step A3"
-            sleep 30
+            echo "Running job A1"
+            sleep 1
 
-  job_b:
+  a2:
     docker:
       - image: circleci/python:3.8
     steps:
       - checkout
       - run:
-          name: Step B1
+          name: A2 (Fail)
           command: |
-            echo "Running step B1"
-            sleep 30
+            echo "Running job A2"
+            sleep 1
+            exit 1
+
+  a3:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
       - run:
-          name: Step B2
+          name: A3
           command: |
-            echo "Running step B2"
-            sleep 30
+            echo "Running job A3"
+            sleep 1
+
+  b1:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
       - run:
-          name: Step B3
+          name: B1
           command: |
-            echo "Running step B3"
-            sleep 30
+            echo "Running job B1"
+            sleep 1
+
+  b2:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: B2
+          command: |
+            echo "Running job B2"
+            sleep 1
+
+  b3:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: B3
+          command: |
+            echo "Running job B3"
+            sleep 1
 
 workflows:
-  test:
+  test-workflow:
     jobs:
-      - job_a
-      - job_b
+      - a1
+      - b1
+      - a2:
+          requires:
+            - a1
+      - a3:
+          requires:
+            - a2
+      - b2:
+          requires:
+            - b1
+      - b3:
+          requires:
+            - b2
