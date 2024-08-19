@@ -7,11 +7,11 @@ jobs:
     steps:
       - run:
           name: "Running Job 1"
-          command: echo $my_env_var
+          command: echo $my_restricted_env
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - job1:
-          context: my-context
+          context: restricted-context
