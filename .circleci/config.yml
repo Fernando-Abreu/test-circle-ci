@@ -14,17 +14,20 @@ jobs:
     steps:
       - run:
           name: "Running Job 1"
-          command: echo "running job 2"
+          command: echo $my_restricted_env
     
 
 workflows:
   version: 2
   build_and_test:
     jobs: 
+      - job1
       - approval_job:
           type: approval
           context: restricted-context
+          requires:
+          - job1
       - job2:
+          context: restricted-context
           requires:
             - approval_job
-          context: restricted-context
