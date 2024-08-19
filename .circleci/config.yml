@@ -7,17 +7,27 @@ jobs:
     steps:
       - run:
           name: "Running Job 1"
+          command: echo "job1"
+  job2:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: "Running Job 1"
           command: echo $my_restricted_env
     
-  approval_job:
-    type: approval
 
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - approval_job
-      - job1:
+      - job1
+      - approval_job:
+          type: approval
+          context: restricted-contex
+          requires:
+          - job1
+      - job2:
           context: restricted-context
           requires:
             - approval_job
