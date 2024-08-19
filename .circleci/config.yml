@@ -23,7 +23,8 @@ workflows:
     jobs: 
       - approval_job:
           type: approval
-          context: restricted-contex
+          context: restricted-context
       - job2:
           requires:
             - approval_job
+          context: restricted-context
