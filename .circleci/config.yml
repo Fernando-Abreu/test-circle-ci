@@ -21,13 +21,9 @@ workflows:
   version: 2
   build_and_test:
     jobs: 
-      # - job1
-      # - approval_job:
-      #     type: approval
-      #     context: restricted-context
-      #     requires:
-      #     - job1
+      - approval_job:
+          type: approval
       - job2:
-          context: restricted-context
-          # requires:
-          #   - approval_job
+          # context: restricted-context
+          requires:
+            - approval_job
