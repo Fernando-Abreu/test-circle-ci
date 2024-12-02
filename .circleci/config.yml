@@ -1,45 +1,70 @@
 version: 2.1
 
 jobs:
-  job1:
+  build:
     docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: "Running Job 1"
-          command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+      - image: cimg/base:current
 
-  job2:
-    docker:
-      - image: cimg/base:stable
     steps:
+      - checkout
       - run:
-          name: "Running Job 2"
-          command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
+          name: "Build"
+          command: "echo build"
+  test:
+    docker:
+      - image: cimg/base:current
 
-  job3:
-    docker:
-      - image: cimg/base:stable
     steps:
+      - checkout
       - run:
-          name: "Running Job 3"
-          command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+          name: "Test"
+          command: "echo test"
+  deploy:
+    docker:
+      - image: cimg/base:current
+
+    steps:
+      - checkout
+      - run:
+          name: "Deploy"
+          command: exit 1
+  
+  release:
+    docker:
+      - image: cimg/base:current
+
+    steps:
+      - checkout
+      - run:
+          name: "Release"
+          command: "echo release" 
+
+  cleanup:
+    docker:
+      - image: cimg/base:current
+
+    steps:
+      - checkout
+      - run:
+          name: "Cleanup"
+          command: "echo cleanup"  
 
 workflows:
-  version: 2
-  build_and_test:
+  say-hello-workflow:
     jobs:
-      - job1
-      - job2
-      - job3:
+      - build
+      - test:
           requires:
-            - job1
+            - build: success
+      - deploy:
+          requires:
+            - test:
+              - success
+      - release:
+          requires:
+            - deploy:
+              - success            
+      - cleanup:
+          requires:
+            - deploy:
+              - failed
