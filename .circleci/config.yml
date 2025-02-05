@@ -1,45 +1,56 @@
 version: 2.1
 
 jobs:
-  job1:
+  a:
     docker:
       - image: cimg/base:stable
     steps:
-      - run:
-          name: "Running Job 1"
-          command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+      - run: echo "Job A successful"
 
-  job2:
+  b:
     docker:
       - image: cimg/base:stable
     steps:
-      - run:
-          name: "Running Job 2"
-          command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
+      - run: exit 1
 
-  job3:
+  or_job:
     docker:
       - image: cimg/base:stable
     steps:
       - run:
-          name: "Running Job 3"
+          name: Check Job Statuses
           command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+            # Fetch workflow jobs statuses
+            curl -s -H "Circle-Token: $CIRCLECI_API_TOKEN" \
+            "https://circleci.com/api/v2/workflow/$CIRCLE_WORKFLOW_ID/job" > jobs.json
+
+            # Check if Job A or Job B succeeded
+            if jq -e '.items[] | select(.name=="job_a" and .status=="success")' jobs.json || \
+               jq -e '.items[] | select(.name=="job_b" and .status=="success")' jobs.json; then
+              echo "At least one job succeeded. Proceeding to deploy."
+              # Trigger deployment (this could be a call to another job or service)
+            else
+              echo "Neither job succeeded. Halting deployment."
+              exit 1
+            fi
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run: echo "Deploying..."
 
 workflows:
-  version: 2
-  build_and_test:
+  deploy_flow:
     jobs:
-      - job1
-      - job2
-      - job3:
+      - a
+      - b
+      - or_job:
           requires:
-            - job1
+            - a
+            - b:
+              - failed
+              - success
+      - deploy:
+          requires:
+            - or_job
