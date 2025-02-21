@@ -16,7 +16,7 @@ workflows:
       - test
       - build
       - deploy:
-          serial-group: b
+          serial-group: << pipeline.git.branch >>
           requires:
             - test
             - build
