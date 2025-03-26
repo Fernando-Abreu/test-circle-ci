@@ -16,7 +16,7 @@ jobs:
     steps:
       - run:
           name: Sleep for 30 seconds
-          command: sleep 60
+          command: sleep 90
 
 workflows:
   main-workflow:
