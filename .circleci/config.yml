@@ -1,45 +1,37 @@
 version: 2.1
 
 jobs:
-  job1:
+  test-job:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/node:20.0  # Replace with an image that suits your project
     steps:
-      - run:
-          name: "Running Job 1"
-          command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+      - checkout
 
-  job2:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: "Running Job 2"
-          command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
+      - restore_cache:
+          name: Restore Node Modules Cache
+          keys:
+            - v1-node-modules-{{ checksum "package-lock.json" }}
+            - v1-node-modules-
 
-  job3:
-    docker:
-      - image: cimg/base:stable
-    steps:
       - run:
-          name: "Running Job 3"
-          command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+          name: Install Dependencies
+          command: npm install
+
+      - run:
+          name: Run Tests
+          command: npm test -- --outputFile=test-results.json
+
+      - store_test_results:
+          path: test-results.json
+
+      - save_cache:
+          name: Save Node Modules Cache
+          key: v1-node-modules-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
 
 workflows:
   version: 2
-  build_and_test:
+  test-workflow:
     jobs:
-      - job1
-      - job2
-      - job3:
-          requires:
-            - job1
+      - test-job
