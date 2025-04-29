@@ -1,34 +1,27 @@
 version: 2.1
 
 jobs:
-  test:
-    type: no-op
-
-  build:
-    type: no-op
-
-  release:
-    type: no-op  
-
-  deploy:
+  job_a:
     docker:
       - image: cimg/base:stable
     steps:
       - run:
-          name: Sleep for 30 seconds
-          command: sleep 90
+          name: Succesfull step
+          command: echo "nothing"
+
+  job_b:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Run only if job_a fails
+          command: echo "job_a failed, so I'm running"
 
 workflows:
+  version: 2.1
   main-workflow:
     jobs:
-      - test
-      - build
-      - deploy:
-          serial-group: 'a'
+      - job_a
+      - job_b:
           requires:
-            - test
-            - build
-      - release:
-          serial-group: 'a'
-          requires: 
-            - deploy
+            - job_a: failed
