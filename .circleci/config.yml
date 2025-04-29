@@ -24,11 +24,11 @@ workflows:
       - test
       - build
       - deploy:
-          serial-group: << pipeline.git.branch >>
+          serial-group: 'a'
           requires:
             - test
             - build
       - release:
-          serial-group: << pipeline.git.branch >>
+          serial-group: 'a'
           requires: 
             - deploy
