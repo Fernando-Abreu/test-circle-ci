@@ -1,45 +1,42 @@
 version: 2.1
 
 jobs:
-  job1:
+  job-a:
     docker:
       - image: cimg/base:stable
     steps:
       - run:
-          name: "Running Job 1"
+          name: Fail Immediately
           command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+            echo "Job A is failing"
+            exit 1
 
-  job2:
+  job-b:
     docker:
       - image: cimg/base:stable
     steps:
       - run:
-          name: "Running Job 2"
+          name: Sleep and Succeed
           command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
+            echo "Job B started"
+            sleep 10
+            echo "Job B succeeded"
 
-  job3:
+  job-c:
     docker:
       - image: cimg/base:stable
     steps:
       - run:
-          name: "Running Job 3"
+          name: Dependent Job
           command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+            echo "Job C depends on B and runs only if B succeeds"
 
 workflows:
   version: 2
-  build_and_test:
+  sample-workflow:
     jobs:
-      - job1
-      - job2
-      - job3:
+      - job-a
+      - job-b
+      - job-c:
           requires:
-            - job1
+            - job-b
