@@ -8,7 +8,12 @@ jobs:
     type: no-op
 
   deploy:
-    type: no-op
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Sleep for 1 minute
+          command: sleep 180
 
 workflows:
   main-workflow:
