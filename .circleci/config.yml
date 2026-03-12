@@ -12,8 +12,7 @@ jobs:
       - image: cimg/base:stable
     steps:
       - run:
-          name: Sleep for 1 minute
-          command: sleep 180
+          exit 1
 
 workflows:
   main-workflow:
