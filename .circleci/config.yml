@@ -1,45 +1,32 @@
 version: 2.1
 
+executors:
+  base-runner:
+    docker:
+      - image: cimg/base:stable
+
 jobs:
-  job1:
-    docker:
-      - image: cimg/base:stable
+  job-fast-fail:
+    executor: base-runner
     steps:
       - run:
-          name: "Running Job 1"
+          name: "Fail fast"
           command: |
-            echo "Job 1 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 1 is done."
+            echo "Simulating a rapid failure..."
+            sleep 5
+            exit 1
 
-  job2:
-    docker:
-      - image: cimg/base:stable
+  job-long-run:
+    executor: base-runner
     steps:
       - run:
-          name: "Running Job 2"
+          name: "Simulate long process"
           command: |
-            echo "Job 2 is starting."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 2 is done."
-
-  job3:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: "Running Job 3"
-          command: |
-            echo "Job 3 is starting, depending on Job 1."
-            sleep 60  # Sleep for 60 seconds to simulate work
-            echo "Job 3 is done."
+            echo "Starting long running job..."
+            sleep 300 # Runs for 5 minutes
 
 workflows:
-  version: 2
-  build_and_test:
+  test-rerun-workflow:
     jobs:
-      - job1
-      - job2
-      - job3:
-          requires:
-            - job1
+      - job-fast-fail
+      - job-long-run
