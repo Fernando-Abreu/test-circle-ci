@@ -20,10 +20,9 @@ jobs:
     executor: base-runner
     steps:
       - run:
-          name: "Simulate long process"
+          name: "Simulate success"
           command: |
-            echo "Starting long running job..."
-            sleep 300 # Runs for 5 minutes
+            exit 0
 
 workflows:
   test-rerun-workflow:
